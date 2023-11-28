@@ -11,7 +11,10 @@ const schema = buildSchema((`
     }
 
     type Store {
+        id: ID
         location: String
+        name: String
+        hasComplimentaryLobsters: Boolean
     }
 
     type Query {
@@ -20,7 +23,7 @@ const schema = buildSchema((`
     }
 
     input StoreInput {
-        location: String
+        id: ID
     }
 
     input ProductInput {

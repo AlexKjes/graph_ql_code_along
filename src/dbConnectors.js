@@ -5,10 +5,13 @@ mongoose.Promise = global.Promise
 mongoose.connect("mongodb://localhost:27017/widgets", {
     auth: {
         username: "root",
-        password: "password"
+        password: "password",
+        database: "stores"
     },
     authSource: "admin"
 })
+
+
 
 const widgetSchema = new mongoose.Schema( {
     name: {
@@ -29,5 +32,6 @@ const widgetSchema = new mongoose.Schema( {
 })
 
 const Widgets = mongoose.model("widgets", widgetSchema);
+
 
 export { Widgets };
