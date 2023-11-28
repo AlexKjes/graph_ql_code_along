@@ -1,17 +1,18 @@
+import { connect } from "mongoose";
 import { createConnection } from "mysql"
 
 var connection;
 
 function connectToDatabase() {
     return new Promise((res, rej) => {
-            connection = createConnection({
-                user: 'root',
-                password: 'password',
-            });
-            connection.connect(err => {
-                err ? rej(err) : res()
-            });
-            console.log("connected to databse");
+        connection = createConnection({
+            user: 'root',
+            password: 'password',
+        });
+        connection.connect(err => {
+            err ? rej(err) : res()
+        });
+        console.log("connected to databse");
     })
 }
 
@@ -46,21 +47,28 @@ function createTable() {
             err ? rej(err) : res(result)))
 }
 
-function populateStores() {
-    return new Promise((res, rej) =>
-        connection.query(`INSERT INTO widgets.STORE (location, name, hasComplimentaryLobsters) VALUES 
-        ("Oslo", "Storgata SuperStore", 1),
-        ("Ski", "Senter Butikken", 0)`,
-            (err, result, __) =>
-                err ? rej(err) : res(result)))
-
+function populateStoresIfEmpty() {
+    return new Promise((res, rej) => {
+        connection.query(`SELECT * FROM widgets.STORE`, (err, result) => {
+            if (err) rej(err)
+            else if (result.length !== 0) res()
+            else {
+                console.log("Populating Stores in sql database");
+                connection.query(`INSERT INTO widgets.STORE (location, name, hasComplimentaryLobsters) VALUES 
+            ("Oslo", "Storgata SuperStore", 1),
+            ("Ski", "Senter Butikken", 0)`,
+                    (err, result, __) =>
+                        err ? rej(err) : res(result))
+            }
+        })
+    })
 }
 
 
 retry(connectToDatabase, 10)
     .then(createDB)
     .then(createTable)
-    .then(populateStores)
+    .then(populateStoresIfEmpty)
     .catch(err => {
         console.log(err);
     })
